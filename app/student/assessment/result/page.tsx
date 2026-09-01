@@ -76,6 +76,18 @@ export default function AssessmentResultPage() {
     );
   }
 
+  const rawScore = Number(assessment.score);
+
+  const riskScore = Number.isFinite(rawScore)
+    ? Math.max(0, Math.min(100, rawScore))
+    : 0;
+  const wellnessScore = 100 - riskScore;
+  // console.log("Assessment Score Debug:", {
+  //   rawScore: assessment.score,
+  //   convertedScore: rawScore,
+  //   riskScore,
+  //   wellnessScore,
+  // });
   return (
     <div className="mx-auto w-full max-w-6xl space-y-4 px-4">
       {/* Title */}
@@ -99,7 +111,7 @@ export default function AssessmentResultPage() {
       <section className="grid gap-4 xl:grid-cols-12">
         <div className="xl:col-span-4">
           <MentalScoreCard
-            score={assessment.score}
+            score={wellnessScore}
             mentalState={
               assessment.mental_state
             }
