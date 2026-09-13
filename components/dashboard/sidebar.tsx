@@ -151,7 +151,7 @@ export default function Sidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <h2 className="truncate text-sm font-bold text-slate-900 dark:text-white">
-                PsycoMentalHub
+                PsyChoMentalHub
               </h2>
 
               <p className="text-[10px] text-slate-400">

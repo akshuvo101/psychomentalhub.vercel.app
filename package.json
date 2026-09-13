@@ -1,5 +1,5 @@
 {
-  "name": "PsycoMentalHub",
+  "name": "PsyChoMentalHub",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -32,9 +32,11 @@
     "react-markdown": "^10.1.0",
     "recharts": "^3.8.1",
     "remark-gfm": "^4.0.1",
+    "resend": "^6.28.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
-    "three": "^0.185.1"
+    "three": "^0.185.1",
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

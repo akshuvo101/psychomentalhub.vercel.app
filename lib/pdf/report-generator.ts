@@ -318,7 +318,7 @@ export async function generateAssessmentReport(
 
 
     pdf.text(
-        "PsycoMentalHub",
+        "PsyChoMentalHub",
         42,
         27
     );
@@ -961,7 +961,7 @@ export async function generateAssessmentReport(
 
 
     pdf.text(
-        "PsycoMentalHub | BUBT Student Wellness Report",
+        "PsyChoMentalHub | BUBT Student Wellness Report",
         PAGE_MARGIN,
         288
     );
@@ -992,7 +992,7 @@ export async function generateAssessmentReport(
 
 
     pdf.save(
-        `PsycoMentalHub_Report_${assessment.id}.pdf`
+        `PsyChoMentalHub_Report_${assessment.id}.pdf`
     );
 
 

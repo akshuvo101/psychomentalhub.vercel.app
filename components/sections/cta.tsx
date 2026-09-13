@@ -1,14 +1,45 @@
+
 "use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Brain,
+  CheckCircle2,
+  Sparkles,
+  ShieldCheck,
+} from "lucide-react";
 
 import Container from "@/components/layout/container";
 
+const highlights = [
+  {
+    icon: Brain,
+    label: "Wellness Assessment",
+  },
+  {
+    icon: Sparkles,
+    label: "AI-Powered Insights",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Privacy-Focused",
+  },
+];
+
 export default function CTA() {
   return (
-    <section className="relative py-24">
+    <section className="relative overflow-hidden py-24 sm:py-28">
+      {/* Background Atmosphere */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-1/2 h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/10 blur-[150px]" />
+
+        <div className="absolute left-0 top-1/4 h-72 w-72 rounded-full bg-teal-500/8 blur-[130px]" />
+
+        <div className="absolute right-0 bottom-1/4 h-72 w-72 rounded-full bg-cyan-500/8 blur-[130px]" />
+      </div>
+
       <Container>
         <motion.div
           initial={{
@@ -21,91 +52,231 @@ export default function CTA() {
           }}
           viewport={{
             once: true,
+            margin: "-100px",
           }}
           transition={{
-            duration: 0.6,
+            duration: 0.7,
           }}
-          className="relative overflow-hidden rounded-[40px] border border-emerald-500/20 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 px-8 py-16 text-center shadow-2xl shadow-emerald-500/20 md:px-16"
+          className="
+            group relative overflow-hidden
+            rounded-[36px]
+            border border-emerald-400/25
+            bg-gradient-to-br
+            from-emerald-600
+            via-teal-600
+            to-cyan-600
+            px-6 py-14
+            shadow-2xl shadow-emerald-500/20
+            sm:px-10 sm:py-16
+            md:rounded-[42px]
+            md:px-16 md:py-20
+          "
         >
-          {/* Glow Effects */}
+          {/* Inner Gradient */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-black/[0.08]" />
 
-          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+          {/* Decorative Glow */}
+          <div
+            className="
+              pointer-events-none absolute
+              -left-24 -top-24
+              h-80 w-80
+              rounded-full
+              bg-white/10
+              blur-[90px]
+              transition-transform duration-1000
+              group-hover:scale-125
+            "
+          />
 
-          <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+          <div
+            className="
+              pointer-events-none absolute
+              -bottom-24 -right-24
+              h-80 w-80
+              rounded-full
+              bg-cyan-300/15
+              blur-[90px]
+              transition-transform duration-1000
+              group-hover:scale-125
+            "
+          />
+
+          {/* Decorative Grid */}
+          <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:40px_40px]" />
 
           {/* Content */}
-
-          <div className="relative z-10 mx-auto max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
+          <div className="relative z-10 mx-auto max-w-4xl text-center">
+            {/* Badge */}
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.95,
+              }}
+              whileInView={{
+                opacity: 1,
+                scale: 1,
+              }}
+              viewport={{
+                once: true,
+              }}
+              transition={{
+                duration: 0.5,
+                delay: 0.15,
+              }}
+              className="
+                mx-auto inline-flex items-center gap-2
+                rounded-full
+                border border-white/20
+                bg-white/10
+                px-4 py-2
+                text-sm font-medium
+                text-white
+                shadow-lg shadow-black/5
+                backdrop-blur-md
+              "
+            >
               <Sparkles className="h-4 w-4" />
-              Start Your Wellness Journey Today
-            </div>
+              Start Your Wellness Journey
+            </motion.div>
 
-            <h2 className="mt-6 text-4xl font-extrabold tracking-tight text-white md:text-6xl">
-              Build Better Habits,
+            {/* Heading */}
+            <h2 className="mt-7 text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+              Understand Yourself.
               <br />
-              Live Healthier Every Day
+              <span className="text-white/90">
+                Take the Next Step.
+              </span>
             </h2>
 
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/85">
-              Track mood, monitor sleep, complete wellness assessments,
-              receive AI-powered recommendations, and take control of
-              your mental and physical well-being.
+            {/* Description */}
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
+              Explore your wellbeing through guided assessment, personalized
+              AI insights, practical recommendations, and meaningful support
+              with PsychoMentalHub.
             </p>
 
-            {/* Buttons */}
-
-            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+            {/* CTA Buttons */}
+            <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/register"
-                className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-7 py-4 font-semibold text-emerald-600 shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="
+                  group/primary
+                  inline-flex items-center justify-center gap-2
+                  rounded-2xl
+                  bg-white
+                  px-7 py-4
+                  text-sm font-bold
+                  text-emerald-700
+                  shadow-xl shadow-emerald-950/15
+                  transition-all duration-300
+                  hover:-translate-y-1
+                  hover:bg-emerald-50
+                  hover:shadow-2xl hover:shadow-black/15
+                  focus:outline-none
+                  focus:ring-2 focus:ring-white/60
+                  focus:ring-offset-2
+                  focus:ring-offset-emerald-600
+                "
               >
                 Get Started Free
 
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <ArrowRight
+                  className="
+                    h-5 w-5
+                    transition-transform duration-300
+                    group-hover/primary:translate-x-1
+                  "
+                />
               </Link>
 
               <Link
                 href="/features"
-                className="inline-flex items-center justify-center rounded-2xl border border-white/30 bg-white/10 px-7 py-4 font-semibold text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20"
+                className="
+                  inline-flex items-center justify-center
+                  rounded-2xl
+                  border border-white/25
+                  bg-white/10
+                  px-7 py-4
+                  text-sm font-semibold
+                  text-white
+                  backdrop-blur-md
+                  transition-all duration-300
+                  hover:-translate-y-1
+                  hover:border-white/40
+                  hover:bg-white/15
+                  focus:outline-none
+                  focus:ring-2 focus:ring-white/50
+                "
               >
-                Learn More
+                Explore Features
               </Link>
             </div>
 
-            {/* Small Stats */}
+            {/* Feature Highlights */}
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 15,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+              }}
+              transition={{
+                duration: 0.55,
+                delay: 0.3,
+              }}
+              className="
+                mx-auto mt-12
+                flex max-w-3xl
+                flex-col
+                items-center
+                justify-center
+                gap-3
+                sm:flex-row sm:gap-4
+              "
+            >
+              {highlights.map((item, index) => {
+                const Icon = item.icon;
 
-            <div className="mt-12 grid gap-6 sm:grid-cols-3">
-              <div>
-                <h3 className="text-3xl font-bold text-white">
-                  10K+
-                </h3>
+                return (
+                  <div
+                    key={item.label}
+                    className="
+                      flex w-full items-center justify-center gap-2
+                      rounded-xl
+                      border border-white/10
+                      bg-white/[0.07]
+                      px-4 py-3
+                      text-sm text-white/85
+                      backdrop-blur-sm
+                      transition-all duration-300
+                      hover:border-white/20
+                      hover:bg-white/10
+                      sm:w-auto
+                    "
+                  >
+                    <Icon className="h-4 w-4 text-white" />
 
-                <p className="text-white/80">
-                  Wellness Logs
-                </p>
-              </div>
+                    <span>{item.label}</span>
 
-              <div>
-                <h3 className="text-3xl font-bold text-white">
-                  95%
-                </h3>
+                    {index < highlights.length - 1 && (
+                      <CheckCircle2 className="ml-1 hidden h-3.5 w-3.5 text-white/50 sm:block" />
+                    )}
+                  </div>
+                );
+              })}
+            </motion.div>
 
-                <p className="text-white/80">
-                  Student Satisfaction
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-3xl font-bold text-white">
-                  24/7
-                </h3>
-
-                <p className="text-white/80">
-                  AI Support
-                </p>
-              </div>
-            </div>
+            {/* Trust Note */}
+            <p className="mt-7 text-xs text-white/55 sm:text-sm">
+              Built to support student wellness with responsible,
+              privacy-focused AI guidance.
+            </p>
           </div>
         </motion.div>
       </Container>

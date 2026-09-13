@@ -95,7 +95,7 @@ export default function AcademicInformationCard({
                     "
                 >
                     Add academic information to personalize
-                    your PsycoMentalHub experience.
+                    your PsyChoMentalHub experience.
                 </p>
             </div>
 

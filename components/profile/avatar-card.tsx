@@ -357,7 +357,7 @@ export default function AvatarCard({
                     "
                 >
                     Complete your profile to unlock all
-                    PsycoMentalHub features.
+                    PsyChoMentalHub features.
                 </p>
             </div>
         </section>
