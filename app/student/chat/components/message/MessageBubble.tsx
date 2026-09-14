@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, BrainCircuit, User } from "lucide-react";
+import { BrainCircuit, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { MessageRole } from "../../types/message";
@@ -40,13 +40,25 @@ export default function MessageBubble({
             items-center
             justify-center
             rounded-full
+            transition-all
+            duration-300
+
             ${
               isUser
                 ? `
-                  bg-slate-900
+                  bg-gradient-to-br
+                  from-cyan-500
+                  via-blue-600
+                  to-indigo-600
                   text-white
-                  dark:bg-blue-500
-                  dark:text-slate-900
+                  shadow-md
+                  shadow-blue-500/20
+
+                  dark:from-emerald-400
+                  dark:via-cyan-500
+                  dark:to-blue-600
+                  dark:text-white
+                  dark:shadow-cyan-500/20
                 `
                 : `
                   bg-gradient-to-br
@@ -55,6 +67,7 @@ export default function MessageBubble({
                   to-blue-500
                   text-white
                   shadow-lg
+                  shadow-cyan-500/20
                 `
             }
           `}
@@ -74,23 +87,42 @@ export default function MessageBubble({
             px-5
             py-4
             shadow-sm
+            transition-all
+            duration-300
 
             ${
               isUser
                 ? `
                   rounded-br-lg
-                  bg-purple-600
+
+                  bg-gradient-to-br
+                  from-cyan-600
+                  via-blue-600
+                  to-indigo-600
+
                   text-white
 
-                  dark:bg-blue-500
-                  dark:text-slate-900
+                  shadow-lg
+                  shadow-blue-500/15
+
+                  dark:from-emerald-500
+                  dark:via-cyan-500
+                  dark:to-blue-600
+
+                  dark:text-white
+
+                  dark:shadow-cyan-500/15
                 `
                 : `
                   rounded-bl-lg
+
                   border
                   border-slate-200/70
+
                   bg-white/90
                   text-slate-900
+
+                  shadow-sm
                   backdrop-blur-xl
 
                   dark:border-slate-800
@@ -111,7 +143,7 @@ export default function MessageBubble({
           )}
 
           <div
-            className="
+            className={`
               prose
               prose-sm
               max-w-none
@@ -133,8 +165,21 @@ export default function MessageBubble({
               prose-a:no-underline
               hover:prose-a:underline
 
-              dark:prose-invert
-            "
+              ${
+                isUser
+                  ? `
+                    prose-invert
+
+                    prose-p:text-white
+                    prose-headings:text-white
+                    prose-strong:text-white
+                    prose-li:text-white
+                  `
+                  : `
+                    dark:prose-invert
+                  `
+              }
+            `}
           >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {content}
@@ -143,11 +188,16 @@ export default function MessageBubble({
 
           {time && (
             <p
-              className={`mt-4 text-[11px] ${
-                isUser
-                  ? "text-white/70"
-                  : "text-slate-400"
-              }`}
+              className={`
+                mt-4
+                text-[11px]
+
+                ${
+                  isUser
+                    ? "text-white/75"
+                    : "text-slate-400"
+                }
+              `}
             >
               {time}
             </p>

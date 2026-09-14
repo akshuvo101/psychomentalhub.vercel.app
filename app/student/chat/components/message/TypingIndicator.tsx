@@ -5,55 +5,31 @@ import { BrainCircuit } from "lucide-react";
 export default function TypingIndicator() {
   return (
     <div className="flex w-full justify-start">
-      <div className="flex max-w-3xl items-center gap-3">
-        {/* AI Avatar */}
+      <div className="flex items-center gap-3">
+        {/* AI Icon */}
         <div
           className="
-            flex
-            h-10
-            w-10
-            shrink-0
-            items-center
-            justify-center
+            flex h-10 w-10 shrink-0 items-center justify-center
             rounded-full
             bg-gradient-to-br
-            from-emerald-500
-            via-cyan-500
-            to-blue-500
+            from-emerald-500 via-cyan-500 to-blue-500
             text-white
-            shadow-lg
+            shadow-lg shadow-cyan-500/20
+            dark:shadow-cyan-400/10
           "
         >
           <BrainCircuit className="h-5 w-5" />
         </div>
 
-        {/* Typing Bubble */}
-        <div
-          className="
-            inline-flex
-            items-center
-            gap-1.5
-            rounded-3xl
-            border
-            border-slate-200/70
-            bg-white/90
-            px-4
-            py-3
-            shadow-md
-            backdrop-blur-xl
-
-            dark:border-slate-800
-            dark:bg-slate-900/80
-          "
-        >
+        {/* Typing Dots — No Bubble */}
+        <div className="flex items-center gap-1.5">
           {/* Dot 1 */}
           <span
             className="
-              h-2
-              w-2
+              h-2.5 w-2.5
               rounded-full
               bg-emerald-500
-              opacity-40
+              dark:bg-emerald-400
               animate-typing-dot
             "
           />
@@ -61,11 +37,10 @@ export default function TypingIndicator() {
           {/* Dot 2 */}
           <span
             className="
-              h-2
-              w-2
+              h-2.5 w-2.5
               rounded-full
               bg-cyan-500
-              opacity-40
+              dark:bg-cyan-400
               animate-typing-dot
             "
             style={{
@@ -76,11 +51,10 @@ export default function TypingIndicator() {
           {/* Dot 3 */}
           <span
             className="
-              h-2
-              w-2
+              h-2.5 w-2.5
               rounded-full
               bg-blue-500
-              opacity-40
+              dark:bg-blue-400
               animate-typing-dot
             "
             style={{
