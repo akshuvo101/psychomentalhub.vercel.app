@@ -1,8 +1,7 @@
 export function formatTime(date: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    hour: "2-digit",
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
     minute: "2-digit",
-    hour12: false,
-    timeZone: "UTC", // mock data stable রাখতে
+    hour12: true,
   }).format(new Date(date));
 }
