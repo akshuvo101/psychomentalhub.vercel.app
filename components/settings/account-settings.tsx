@@ -7,24 +7,69 @@ import {
     LogOut,
     Trash2,
     LockKeyhole,
+    Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AccountSettings() {
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isSigningOut, setIsSigningOut] = useState(false);
+
+    const supabase = createClient();
 
     function handleChangePassword() {
-        // Password change flow can be connected later.
         console.log("Change password");
     }
 
-    function handleSignOut() {
-        // Connect with your Supabase sign-out flow later.
-        console.log("Sign out");
+    async function handleSignOut() {
+        if (isSigningOut) return;
+
+        try {
+            setIsSigningOut(true);
+
+            const { error } =
+                await supabase.auth.signOut();
+
+            if (error) {
+                console.error(
+                    "Supabase sign out error:",
+                    error
+                );
+
+                toast.error(
+                    "Unable to sign out. Please try again."
+                );
+
+                setIsSigningOut(false);
+                return;
+            }
+
+            toast.success(
+                "Signed out successfully"
+            );
+
+            // Give the toast a moment to appear
+            setTimeout(() => {
+                window.location.replace("/login");
+            }, 300);
+
+        } catch (error) {
+            console.error(
+                "Sign out failed:",
+                error
+            );
+
+            toast.error(
+                "Something went wrong while signing out."
+            );
+
+            setIsSigningOut(false);
+        }
     }
 
     function handleDeleteAccount() {
-        // Account deletion flow will be connected later.
         console.log("Delete account");
     }
 
@@ -49,6 +94,7 @@ export default function AccountSettings() {
 
             {/* Security Options */}
             <div className="space-y-2.5">
+
                 {/* Change Password */}
                 <button
                     type="button"
@@ -112,7 +158,9 @@ export default function AccountSettings() {
                         aria-checked={twoFactorEnabled}
                         aria-label="Toggle two-factor authentication"
                         onClick={() =>
-                            setTwoFactorEnabled((previous) => !previous)
+                            setTwoFactorEnabled(
+                                (previous) => !previous
+                            )
                         }
                         className={`relative h-[22px] w-10 shrink-0 rounded-full p-0.5 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500/30 ${
                             twoFactorEnabled
@@ -134,19 +182,28 @@ export default function AccountSettings() {
                 <button
                     type="button"
                     onClick={handleSignOut}
-                    className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 p-3 text-left transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+                    disabled={isSigningOut}
+                    className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 p-3 text-left transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-800 dark:hover:bg-slate-800"
                 >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                        <LogOut className="h-3.5 w-3.5" />
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                        {isSigningOut ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                            <LogOut className="h-3.5 w-3.5" />
+                        )}
                     </div>
 
                     <div>
                         <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                            Sign Out
+                            {isSigningOut
+                                ? "Signing Out..."
+                                : "Sign Out"}
                         </p>
 
                         <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
-                            Sign out from this account.
+                            {isSigningOut
+                                ? "Ending your current session."
+                                : "Sign out from this account."}
                         </p>
                     </div>
                 </button>
@@ -155,10 +212,12 @@ export default function AccountSettings() {
                 {!showDeleteConfirm ? (
                     <button
                         type="button"
-                        onClick={() => setShowDeleteConfirm(true)}
+                        onClick={() =>
+                            setShowDeleteConfirm(true)
+                        }
                         className="flex w-full items-center gap-2.5 rounded-xl border border-red-200 bg-red-50/50 p-3 text-left transition-colors hover:bg-red-50 dark:border-red-900/40 dark:bg-red-500/[0.04] dark:hover:bg-red-500/[0.08]"
                     >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-500/10 dark:text-red-400">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-500/10 dark:text-red-400">
                             <Trash2 className="h-3.5 w-3.5" />
                         </div>
 

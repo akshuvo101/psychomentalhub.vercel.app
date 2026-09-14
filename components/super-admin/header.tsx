@@ -177,6 +177,8 @@ export default function SuperAdminHeader() {
           {/* Notifications */}
 
           <button
+            type="button"
+            aria-label="Open super admin notifications"
             className="
               relative
               rounded-2xl
@@ -214,6 +216,8 @@ export default function SuperAdminHeader() {
             ref={menuRef}
           >
             <button
+              type="button"
+              aria-label="Toggle super admin profile menu"
               onClick={() =>
                 setOpenMenu(!openMenu)
               }

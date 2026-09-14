@@ -3,21 +3,18 @@
 import {
   BadgeCheck,
   Brain,
-  TrendingUp,
 } from "lucide-react";
 
 interface MentalScoreCardProps {
   score: number;
   mentalState: string;
   confidence: number;
-  weeklyChange?: number;
 }
 
 export default function MentalScoreCard({
   score,
   mentalState,
   confidence,
-  weeklyChange = 0,
 }: MentalScoreCardProps) {
   const radius = 40;
 
@@ -26,8 +23,7 @@ export default function MentalScoreCard({
 
   const offset =
     circumference -
-    (Math.max(0, Math.min(score, 100)) /
-      100) *
+    (Math.max(0, Math.min(score, 100)) / 100) *
       circumference;
 
   return (
@@ -51,11 +47,11 @@ export default function MentalScoreCard({
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-widest text-slate-500">
-            Overall Score
+            Risk Score
           </p>
 
           <h2 className="mt-0.5 text-base font-bold">
-            Mental Health
+            Mental Health Risk
           </h2>
         </div>
 
@@ -146,6 +142,12 @@ export default function MentalScoreCard({
         </div>
       </div>
 
+      {/* Risk Explanation */}
+
+      <p className="mt-2 text-center text-[10px] text-slate-500">
+        Higher score indicates higher risk
+      </p>
+
       {/* Mental State */}
 
       <div
@@ -176,9 +178,9 @@ export default function MentalScoreCard({
         </h3>
       </div>
 
-      {/* Stats */}
+      {/* Confidence */}
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-3">
         <div
           className="
             rounded-lg
@@ -199,39 +201,6 @@ export default function MentalScoreCard({
 
           <h4 className="mt-1.5 text-lg font-bold">
             {confidence}%
-          </h4>
-        </div>
-
-        <div
-          className="
-            rounded-lg
-            border
-            border-slate-200
-            p-2.5
-
-            dark:border-slate-700
-          "
-        >
-          <div className="flex items-center gap-1.5">
-            <TrendingUp className="h-3.5 w-3.5 text-cyan-500" />
-
-            <span className="text-[10px] text-slate-500">
-              Weekly
-            </span>
-          </div>
-
-          <h4
-            className={`mt-1.5 text-lg font-bold ${
-              weeklyChange > 0
-                ? "text-emerald-500"
-                : weeklyChange < 0
-                ? "text-red-500"
-                : "text-slate-500"
-            }`}
-          >
-            {weeklyChange > 0
-              ? `+${weeklyChange}%`
-              : `${weeklyChange}%`}
           </h4>
         </div>
       </div>

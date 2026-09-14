@@ -76,7 +76,10 @@ export default function SuperAdminMobileSidebar() {
       {/* Menu Button */}
 
       <button
+        type="button"
         onClick={() => setOpen(true)}
+        aria-label="Open super admin navigation"
+        aria-expanded={open}
         className="
           flex
           h-10
@@ -178,7 +181,9 @@ export default function SuperAdminMobileSidebar() {
           </Link>
 
           <button
+            type="button"
             onClick={() => setOpen(false)}
+            aria-label="Close super admin navigation"
             className="
               flex
               h-9

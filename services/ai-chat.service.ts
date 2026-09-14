@@ -570,23 +570,28 @@ ASSISTANT:
        * The database trigger will automatically
        * update updated_at.
        */
-      if (
-        conversation.title ===
-        "New Conversation" &&
-        dbMessages.length <= 1
-      ) {
-        const title =
+      const isFirstUserMessage =
+        dbMessages.filter((message) => message.role === "user").length === 1;
+
+      const shouldGenerateTitle =
+        isFirstUserMessage &&
+        (
+          conversation.title === "New Conversation" ||
+          conversation.title === "Wellness Assessment"
+        );
+
+      let updatedTitle = conversation.title;
+
+      if (shouldGenerateTitle) {
+        updatedTitle =
           trimmedContent.length > 50
-            ? `${trimmedContent.slice(
-              0,
-              50
-            )}...`
+            ? `${trimmedContent.slice(0, 50)}...`
             : trimmedContent;
 
         await this.conversationRepository.updateConversation(
           conversationId,
           {
-            title,
+            title: updatedTitle,
           }
         );
       }
@@ -598,6 +603,7 @@ ASSISTANT:
       return {
         userMessage,
         assistantMessage,
+        conversationTitle: updatedTitle,
       };
     } catch (error) {
       console.error(

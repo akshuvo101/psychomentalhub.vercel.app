@@ -178,6 +178,8 @@ export default function DoctorHeader() {
           {/* Notifications */}
 
           <button
+            type="button"
+            aria-label="Open doctor notifications"
             className="
               relative
               rounded-2xl
@@ -215,6 +217,8 @@ export default function DoctorHeader() {
             ref={menuRef}
           >
             <button
+              type="button"
+              aria-label="Toggle doctor profile menu"
               onClick={() =>
                 setOpenMenu(!openMenu)
               }

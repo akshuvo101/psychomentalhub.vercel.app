@@ -71,7 +71,10 @@ export default function DoctorMobileSidebar() {
       {/* Menu Button */}
 
       <button
+        type="button"
         onClick={() => setOpen(true)}
+        aria-label="Open doctor navigation"
+        aria-expanded={open}
         className="
           flex
           h-10
@@ -173,7 +176,9 @@ export default function DoctorMobileSidebar() {
           </Link>
 
           <button
+            type="button"
             onClick={() => setOpen(false)}
+            aria-label="Close doctor navigation"
             className="
               flex
               h-9

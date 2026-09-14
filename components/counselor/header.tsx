@@ -178,6 +178,8 @@ export default function CounselorHeader() {
           {/* Notification */}
 
           <button
+            type="button"
+            aria-label="Open counselor notifications"
             className="
               relative
               rounded-2xl
@@ -215,6 +217,8 @@ export default function CounselorHeader() {
             ref={menuRef}
           >
             <button
+              type="button"
+              aria-label="Toggle counselor profile menu"
               onClick={() =>
                 setOpenMenu(!openMenu)
               }

@@ -58,7 +58,10 @@ export default function CounselorMobileSidebar() {
       {/* Menu Button */}
 
       <button
+        type="button"
         onClick={() => setOpen(true)}
+        aria-label="Open counselor navigation"
+        aria-expanded={open}
         className="
           flex
           h-10
@@ -160,7 +163,9 @@ export default function CounselorMobileSidebar() {
           </Link>
 
           <button
+            type="button"
             onClick={() => setOpen(false)}
+            aria-label="Close counselor navigation"
             className="
               flex
               h-9

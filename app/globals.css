@@ -6,12 +6,10 @@
 /* Theme Variables */
 
 :root {
-  --background: #ffffff;
+  --background: #f7fbfa;
   --foreground: #0f172a;
-
   --card: #ffffff;
   --card-foreground: #0f172a;
-
   --border: #e2e8f0;
   --primary: #10b981;
 }
@@ -50,12 +48,26 @@ html {
 
 body {
   min-height: 100vh;
-
-  background-color: var(--background);
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(16, 185, 129, 0.07),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(34, 211, 238, 0.06),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(59, 130, 246, 0.045),
+      transparent 32%
+    ),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
-
   font-family: var(--font-geist-sans);
-
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
@@ -103,4 +115,23 @@ body {
 
 #__next {
   height: 100%;
+}
+
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+.animate-typing-dot {
+  animation: typing-dot 1.2s ease-in-out infinite;
 }

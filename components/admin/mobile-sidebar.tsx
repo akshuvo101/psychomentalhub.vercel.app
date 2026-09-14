@@ -75,8 +75,13 @@ export default function MobileSidebar({
             Admin Panel
           </h2>
 
-          <button onClick={onClose}>
-            <X />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close admin navigation"
+            className="rounded-lg p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
 

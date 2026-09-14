@@ -1,6 +1,5 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
 import { format } from "date-fns";
 
 import {
@@ -8,11 +7,9 @@ import {
     Recommendation,
 } from "@/types/assessment";
 
-
-
 const PAGE_WIDTH = 210;
+const PAGE_HEIGHT = 297;
 const PAGE_MARGIN = 15;
-
 
 const PRIMARY: [number, number, number] = [
     16,
@@ -20,13 +17,11 @@ const PRIMARY: [number, number, number] = [
     129,
 ];
 
-
 const DARK: [number, number, number] = [
     31,
     41,
     55,
 ];
-
 
 const LIGHT: [number, number, number] = [
     100,
@@ -34,93 +29,54 @@ const LIGHT: [number, number, number] = [
     139,
 ];
 
-
 const BORDER: [number, number, number] = [
     226,
     232,
     240,
 ];
 
-
+const SOFT_BG: [number, number, number] = [
+    248,
+    250,
+    252,
+];
 
 interface ReportStudent {
-
     full_name: string;
-
     student_id: string;
-
     university: string;
-
     department: string;
-
     semester: string;
-
 }
 
-
-
-function loadImage(
-    src: string
-): Promise<string> {
-
-
+function loadImage(src: string): Promise<string> {
     return fetch(src)
-
-        .then(res => {
-
+        .then((res) => {
             if (!res.ok) {
-
-                throw new Error(
-                    "Image not found"
-                );
-
+                throw new Error("Image not found");
             }
 
-
             return res.blob();
-
         })
-
-        .then(blob => {
-
-
-            return new Promise(
-                resolve => {
-
-
-                    const reader =
-                        new FileReader();
-
-
+        .then(
+            (blob) =>
+                new Promise((resolve, reject) => {
+                    const reader = new FileReader();
 
                     reader.onloadend = () => {
-
-
-                        resolve(
-                            reader.result as string
-                        );
-
-
+                        resolve(reader.result as string);
                     };
 
+                    reader.onerror = () => {
+                        reject(
+                            new Error("Failed to read image")
+                        );
+                    };
 
-
-                    reader.readAsDataURL(
-                        blob
-                    );
-
-
-                }
-            );
-
-
-        });
-
-
+                    reader.readAsDataURL(blob);
+                })
+        );
 }
-
-
-
 
 function addTitle(
     pdf: jsPDF,
@@ -128,73 +84,66 @@ function addTitle(
     y: number,
     size = 13
 ) {
-
-
-    pdf.setFont(
-        "helvetica",
-        "bold"
-    );
-
-
-    pdf.setFontSize(
-        size
-    );
-
-
-    pdf.setTextColor(
-        ...DARK
-    );
-
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(size);
+    pdf.setTextColor(...DARK);
 
     pdf.text(
         text,
         PAGE_MARGIN,
         y
     );
-
-
 }
 
+function formatDate(date: string) {
+    const parsedDate = new Date(date);
 
-
-
-function formatDate(
-    date: string
-) {
+    if (Number.isNaN(parsedDate.getTime())) {
+        return format(
+            new Date(),
+            "dd MMM yyyy"
+        );
+    }
 
     return format(
-        new Date(date),
+        parsedDate,
         "dd MMM yyyy"
     );
-
 }
 
+function getRiskScore(score: number) {
+    if (!Number.isFinite(score)) {
+        return 0;
+    }
 
+    return Math.max(
+        0,
+        Math.min(100, Math.round(score))
+    );
+}
 
+function getStudentValue(
+    value: string | undefined,
+    fallback = "Not provided"
+) {
+    const trimmed = value?.trim();
 
+    return trimmed
+        ? trimmed
+        : fallback;
+}
 
 export async function generateAssessmentReport(
     assessment: Assessment,
     student: ReportStudent
 ) {
-
-
-    const pdf =
-        new jsPDF({
-
-            orientation: "portrait",
-
-            unit: "mm",
-
-            format: "a4",
-
-        });
-
-
+    const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+    });
 
     let y = 15;
-
-
 
     /*
     ===================================
@@ -202,34 +151,19 @@ export async function generateAssessmentReport(
     ===================================
     */
 
-
     let logo: string | null = null;
 
-
     try {
-
-        logo =
-            await loadImage(
-                "/bubt-logo.png"
-            );
-
-    }
-    catch {
-
-        console.log(
-            "Logo missing"
+        logo = await loadImage(
+            "/images/bubt-logo.png"
         );
-
+    } catch {
+        console.log(
+            "BUBT logo could not be loaded."
+        );
     }
 
-
-
-    pdf.setFillColor(
-        248,
-        250,
-        252
-    );
-
+    pdf.setFillColor(...SOFT_BG);
 
     pdf.rect(
         0,
@@ -239,10 +173,7 @@ export async function generateAssessmentReport(
         "F"
     );
 
-
-
     if (logo) {
-
         pdf.addImage(
             logo,
             "PNG",
@@ -251,27 +182,20 @@ export async function generateAssessmentReport(
             20,
             20
         );
-
     }
 
-
+    /*
+    University
+    */
 
     pdf.setFont(
         "helvetica",
         "bold"
     );
 
+    pdf.setFontSize(14);
 
-    pdf.setFontSize(
-        14
-    );
-
-
-    pdf.setTextColor(
-        ...DARK
-    );
-
-
+    pdf.setTextColor(...DARK);
 
     pdf.text(
         "Bangladesh University of Business & Technology",
@@ -279,19 +203,16 @@ export async function generateAssessmentReport(
         12
     );
 
-
+    /*
+    Department
+    */
 
     pdf.setFont(
         "helvetica",
         "normal"
     );
 
-
-    pdf.setFontSize(
-        9
-    );
-
-
+    pdf.setFontSize(9);
 
     pdf.text(
         "Department of Computer Science & Engineering",
@@ -299,48 +220,37 @@ export async function generateAssessmentReport(
         18
     );
 
-
+    /*
+    Project name
+    */
 
     pdf.setFont(
         "helvetica",
         "bold"
     );
 
+    pdf.setFontSize(12);
 
-    pdf.setFontSize(
-        12
-    );
-
-
-    pdf.setTextColor(
-        ...PRIMARY
-    );
-
+    pdf.setTextColor(...PRIMARY);
 
     pdf.text(
-        "PsyChoMentalHub",
+        "PsychoMentalHub",
         42,
         27
     );
 
-
+    /*
+    Report type
+    */
 
     pdf.setFont(
         "helvetica",
         "normal"
     );
 
+    pdf.setFontSize(8);
 
-    pdf.setFontSize(
-        8
-    );
-
-
-    pdf.setTextColor(
-        ...LIGHT
-    );
-
-
+    pdf.setTextColor(...LIGHT);
 
     pdf.text(
         "AI Mental Wellness Assessment Report",
@@ -348,19 +258,13 @@ export async function generateAssessmentReport(
         33
     );
 
-
-
     y = 48;
-
-
-
 
     /*
     ===================================
-    TITLE
+    REPORT TITLE
     ===================================
     */
-
 
     addTitle(
         pdf,
@@ -369,19 +273,16 @@ export async function generateAssessmentReport(
         16
     );
 
-
     y += 7;
 
-
-    pdf.setFontSize(
-        9
+    pdf.setFont(
+        "helvetica",
+        "normal"
     );
 
+    pdf.setFontSize(9);
 
-    pdf.setTextColor(
-        ...LIGHT
-    );
-
+    pdf.setTextColor(...LIGHT);
 
     pdf.text(
         "AI-assisted wellness evaluation for student self-awareness.",
@@ -389,18 +290,13 @@ export async function generateAssessmentReport(
         y
     );
 
-
-
     y += 10;
-
-
 
     /*
     ===================================
-    STUDENT INFO
+    STUDENT INFORMATION
     ===================================
     */
-
 
     addTitle(
         pdf,
@@ -408,93 +304,86 @@ export async function generateAssessmentReport(
         y
     );
 
-
     y += 5;
 
+    autoTable(pdf, {
+        startY: y,
 
-
-    autoTable(
-        pdf,
-        {
-
-            startY: y,
-
-
-            body: [
-
-                [
-                    "Name",
+        body: [
+            [
+                "Name",
+                getStudentValue(
                     student.full_name
-                ],
-
-                [
-                    "Student ID",
-                    student.student_id
-                ],
-
-                [
-                    "Department",
-                    student.department
-                ],
-
-                [
-                    "Semester",
-                    student.semester
-                ],
-
-                [
-                    "University",
-                    student.university
-                ],
-
+                ),
             ],
+            [
+                "Student ID",
+                getStudentValue(
+                    student.student_id
+                ),
+            ],
+            [
+                "Department",
+                getStudentValue(
+                    student.department
+                ),
+            ],
+            [
+                "Semester",
+                getStudentValue(
+                    student.semester
+                ),
+            ],
+            [
+                "University",
+                getStudentValue(
+                    student.university
+                ),
+            ],
+        ],
 
+        theme: "grid",
 
+        styles: {
+            fontSize: 8,
+            cellPadding: 3,
+            textColor: DARK,
+        },
 
-            theme: "grid",
+        headStyles: {
+            fillColor: PRIMARY,
+            textColor: 255,
+        },
 
-
-            styles: {
-
-                fontSize: 8,
-
-                cellPadding: 3
-
+        columnStyles: {
+            0: {
+                cellWidth: 35,
+                fontStyle: "bold",
             },
 
+            1: {
+                cellWidth: 120,
+            },
+        },
 
-            columnStyles: {
+        tableWidth: 155,
 
-                0: {
-                    cellWidth: 35,
-                    fontStyle: "bold"
-                },
-
-                1: {
-                    cellWidth: 120
-                }
-
-            }
-
-
-        }
-    );
-
-
+        margin: {
+            left: PAGE_MARGIN,
+            right: PAGE_MARGIN,
+        },
+    });
 
     y =
         (pdf as any)
             .lastAutoTable
             .finalY + 8;
 
-
-
     /*
     ===================================
-    ASSESSMENT SCORE
+    ASSESSMENT OVERVIEW
     ===================================
     */
-
 
     addTitle(
         pdf,
@@ -502,78 +391,87 @@ export async function generateAssessmentReport(
         y
     );
 
-
     y += 5;
 
-
-
-    autoTable(
-        pdf,
-        {
-
-            startY: y,
-
-
-            head: [
-
-                [
-                    "Score",
-                    "Mental State",
-                    "Confidence"
-                ]
-
-            ],
-
-
-            body: [
-
-                [
-                    `${assessment.score}/100`,
-                    assessment.mental_state,
-                    `${assessment.confidence}%`
-                ]
-
-            ],
-
-
-            theme: "grid",
-
-
-            headStyles: {
-
-                fillColor: PRIMARY,
-
-                textColor: 255,
-
-                halign: "center"
-
-            },
-
-
-            styles: {
-
-                fontSize: 9,
-
-                cellPadding: 4
-
-            }
-
-        }
-
+    const riskScore = getRiskScore(
+        Number(assessment.score)
     );
 
+    autoTable(pdf, {
+        startY: y,
 
+        head: [
+            [
+                "Risk Score",
+                "Mental State",
+                "Confidence",
+            ],
+        ],
+
+        body: [
+            [
+                `${riskScore}/100`,
+                assessment.mental_state ||
+                    "Not available",
+                `${assessment.confidence ?? 0}%`,
+            ],
+        ],
+
+        theme: "grid",
+
+        headStyles: {
+            fillColor: PRIMARY,
+            textColor: 255,
+            halign: "center",
+        },
+
+        bodyStyles: {
+            textColor: DARK,
+        },
+
+        styles: {
+            fontSize: 9,
+            cellPadding: 4,
+            halign: "center",
+        },
+
+        margin: {
+            left: PAGE_MARGIN,
+            right: PAGE_MARGIN,
+        },
+    });
 
     y =
         (pdf as any)
             .lastAutoTable
-            .finalY + 8;
+            .finalY + 3;
+
     /*
-    ===================================
-    AI SUMMARY
-    ===================================
+    Risk score explanation
     */
 
+    pdf.setFont(
+        "helvetica",
+        "italic"
+    );
+
+    pdf.setFontSize(7.5);
+
+    pdf.setTextColor(...LIGHT);
+
+    pdf.text(
+        "Higher scores indicate higher reported wellness risk based on assessment responses.",
+        PAGE_MARGIN,
+        y + 4
+    );
+
+    y += 12;
+
+    /*
+    ===================================
+    AI WELLNESS SUMMARY
+    ===================================
+    */
 
     addTitle(
         pdf,
@@ -581,48 +479,34 @@ export async function generateAssessmentReport(
         y
     );
 
-
     y += 6;
-
-
 
     pdf.setFont(
         "helvetica",
         "normal"
     );
 
+    pdf.setFontSize(9);
 
-    pdf.setFontSize(
-        9
-    );
-
-
-    pdf.setTextColor(
-        ...DARK
-    );
-
-
+    pdf.setTextColor(...DARK);
 
     const summary =
         (
             assessment.ai_summary ??
-            "No AI summary available."
+            "No AI summary is available for this assessment."
         )
+            .trim()
             .substring(
                 0,
-                320
+                500
             );
-
-
 
     const summaryLines =
         pdf.splitTextToSize(
             summary,
             PAGE_WIDTH -
-            PAGE_MARGIN * 2
+                PAGE_MARGIN * 2
         );
-
-
 
     pdf.text(
         summaryLines,
@@ -630,14 +514,9 @@ export async function generateAssessmentReport(
         y
     );
 
-
-
     y +=
         summaryLines.length * 4 +
         8;
-
-
-
 
     /*
     ===================================
@@ -645,135 +524,159 @@ export async function generateAssessmentReport(
     ===================================
     */
 
-
     addTitle(
         pdf,
         "Wellness Insights",
         y
     );
 
-
     y += 5;
 
-
-
-    if (
-        assessment.ai_analysis
-    ) {
-
-
-        autoTable(
-            pdf,
+    if (assessment.ai_analysis) {
+        const insights = [
             {
+                area: "Stress",
+                level:
+                    assessment.ai_analysis
+                        .stress?.level,
+            },
+            {
+                area: "Anxiety",
+                level:
+                    assessment.ai_analysis
+                        .anxiety?.level,
+            },
+            {
+                area: "Depression",
+                level:
+                    assessment.ai_analysis
+                        .depression?.level,
+            },
+            {
+                area: "Burnout",
+                level:
+                    assessment.ai_analysis
+                        .burnout?.level,
+            },
+            {
+                area: "Sleep",
+                level:
+                    assessment.ai_analysis
+                        .sleep?.level,
+            },
+            {
+                area: "Focus",
+                level:
+                    assessment.ai_analysis
+                        .focus?.level,
+            },
+            {
+                area: "Social",
+                level:
+                    assessment.ai_analysis
+                        .social?.level,
+            },
+        ].filter(
+            (item) =>
+                item.level &&
+                String(item.level).trim()
+        );
 
-
+        if (insights.length > 0) {
+            autoTable(pdf, {
                 startY: y,
 
-
                 head: [
-
                     [
                         "Area",
-                        "Level"
+                        "Level",
+                    ],
+                ],
+
+                body: insights.map(
+                    (item) => [
+                        item.area,
+                        item.level,
                     ]
-
-                ],
-
-
-
-                body: [
-
-
-                    [
-                        "Stress",
-                        assessment.ai_analysis.stress.level
-                    ],
-
-
-                    [
-                        "Anxiety",
-                        assessment.ai_analysis.anxiety.level
-                    ],
-
-
-                    [
-                        "Sleep",
-                        assessment.ai_analysis.sleep.level
-                    ],
-
-
-                    [
-                        "Focus",
-                        assessment.ai_analysis.focus.level
-                    ],
-
-
-                ],
-
-
+                ),
 
                 theme: "grid",
 
-
-
                 headStyles: {
-
-                    fillColor:
-                        PRIMARY,
-
-                    textColor:
-                        255,
-
-                    halign:
-                        "center"
-
+                    fillColor: PRIMARY,
+                    textColor: 255,
+                    halign: "center",
                 },
 
-
+                bodyStyles: {
+                    textColor: DARK,
+                },
 
                 styles: {
-
-                    fontSize:
-                        8,
-
-                    cellPadding:
-                        3
-
+                    fontSize: 8,
+                    cellPadding: 3,
                 },
 
-
-
                 columnStyles: {
-
                     0: {
-                        cellWidth: 70
+                        cellWidth: 70,
+                        fontStyle: "bold",
                     },
 
                     1: {
                         cellWidth: 70,
-                        halign: "center"
-                    }
+                        halign: "center",
+                    },
+                },
 
-                }
+                tableWidth: 140,
 
+                margin: {
+                    left: PAGE_MARGIN,
+                    right: PAGE_MARGIN,
+                },
+            });
 
+            y =
+                (pdf as any)
+                    .lastAutoTable
+                    .finalY + 8;
+        } else {
+            pdf.setFont(
+                "helvetica",
+                "normal"
+            );
 
-            }
+            pdf.setFontSize(9);
 
+            pdf.setTextColor(...LIGHT);
+
+            pdf.text(
+                "No detailed wellness insights are available.",
+                PAGE_MARGIN,
+                y
+            );
+
+            y += 10;
+        }
+    } else {
+        pdf.setFont(
+            "helvetica",
+            "normal"
         );
 
+        pdf.setFontSize(9);
 
+        pdf.setTextColor(...LIGHT);
 
-        y =
-            (pdf as any)
-                .lastAutoTable
-                .finalY + 8;
+        pdf.text(
+            "No detailed wellness insights are available.",
+            PAGE_MARGIN,
+            y
+        );
 
-
+        y += 10;
     }
-
-
-
 
     /*
     ===================================
@@ -781,85 +684,67 @@ export async function generateAssessmentReport(
     ===================================
     */
 
-
     addTitle(
         pdf,
         "Recommended Wellness Actions",
         y
     );
 
-
-
     y += 6;
-
-
 
     pdf.setFont(
         "helvetica",
         "normal"
     );
 
+    pdf.setFontSize(9);
 
-    pdf.setFontSize(
-        9
-    );
+    pdf.setTextColor(...DARK);
 
+    const recommendations =
+        assessment.recommendations ??
+        [];
 
-
-    if (
-        assessment.recommendations.length === 0
-    ) {
-
+    if (recommendations.length === 0) {
+        pdf.setTextColor(...LIGHT);
 
         pdf.text(
-            "No recommendations available.",
+            "No recommendations are available.",
             PAGE_MARGIN,
             y
         );
 
-
-    }
-
-    else {
-
-
-        assessment.recommendations
+        y += 5;
+    } else {
+        recommendations
             .slice(0, 3)
             .forEach(
-
                 (
                     item: Recommendation,
                     index: number
                 ) => {
-
-
                     const text =
                         `${index + 1}. ${item.title}`;
 
-
+                    const lines =
+                        pdf.splitTextToSize(
+                            text,
+                            PAGE_WIDTH -
+                                PAGE_MARGIN * 2
+                        );
 
                     pdf.text(
-                        text,
+                        lines,
                         PAGE_MARGIN,
                         y
                     );
 
-
-
-                    y += 5;
-
-
-
+                    y +=
+                        lines.length * 4 +
+                        2;
                 }
-
             );
-
-
     }
-
-
-
-
 
     /*
     ===================================
@@ -867,16 +752,9 @@ export async function generateAssessmentReport(
     ===================================
     */
 
-
     y += 5;
 
-
-
-    pdf.setDrawColor(
-        ...BORDER
-    );
-
-
+    pdf.setDrawColor(...BORDER);
 
     pdf.line(
         PAGE_MARGIN,
@@ -885,45 +763,26 @@ export async function generateAssessmentReport(
         y
     );
 
-
-
-    y += 8;
-
-
+    y += 7;
 
     pdf.setFont(
         "helvetica",
         "italic"
     );
 
+    pdf.setFontSize(7);
 
-
-    pdf.setFontSize(
-        7
-    );
-
-
-
-    pdf.setTextColor(
-        ...LIGHT
-    );
-
-
+    pdf.setTextColor(...LIGHT);
 
     const disclaimer =
-
-        "This AI-generated report is intended for educational and self-awareness purposes only. It does not represent a medical diagnosis.";
-
-
+        "This AI-assisted report is intended for educational and self-awareness purposes only. It is not a medical diagnosis and should not replace professional mental health advice.";
 
     const disclaimerLines =
         pdf.splitTextToSize(
             disclaimer,
             PAGE_WIDTH -
-            PAGE_MARGIN * 2
+                PAGE_MARGIN * 2
         );
-
-
 
     pdf.text(
         disclaimerLines,
@@ -931,69 +790,45 @@ export async function generateAssessmentReport(
         y
     );
 
-
-
-
-
     /*
     ===================================
     FOOTER
     ===================================
     */
 
-
     pdf.setFont(
         "helvetica",
         "normal"
     );
 
+    pdf.setFontSize(8);
 
-    pdf.setFontSize(
-        8
-    );
-
-
-
-    pdf.setTextColor(
-        ...LIGHT
-    );
-
-
+    pdf.setTextColor(...LIGHT);
 
     pdf.text(
-        "PsyChoMentalHub | BUBT Student Wellness Report",
+        "PsychoMentalHub • BUBT Student Wellness Assessment",
         PAGE_MARGIN,
-        288
+        PAGE_HEIGHT - 9
     );
 
-
-
     pdf.text(
-        format(
-            new Date(),
-            "dd MMM yyyy"
+        formatDate(
+            new Date().toISOString()
         ),
         PAGE_WIDTH - PAGE_MARGIN,
-        288,
+        PAGE_HEIGHT - 9,
         {
-            align: "right"
+            align: "right",
         }
     );
 
-
-
-
-
     /*
     ===================================
-    SAVE
+    SAVE PDF
     ===================================
     */
 
-
     pdf.save(
-        `PsyChoMentalHub_Report_${assessment.id}.pdf`
+        `PsychoMentalHub_Report_${assessment.id}.pdf`
     );
-
-
 }

@@ -74,10 +74,7 @@ export default function AuthCard({ type }: AuthCardProps) {
         return;
       }
 
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -91,8 +88,11 @@ export default function AuthCard({ type }: AuthCardProps) {
       const role = await getUserRole();
 
       router.push(getDashboardRoute(role || "student"));
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Something went wrong";
+
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -171,7 +171,11 @@ export default function AuthCard({ type }: AuthCardProps) {
 
         {/* Form */}
 
-        <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          aria-busy={loading}
+          className="space-y-3.5 sm:space-y-4"
+        >
           {/* Full Name */}
 
           {!isLogin && (
@@ -193,6 +197,7 @@ export default function AuthCard({ type }: AuthCardProps) {
                 <input
                   type="text"
                   placeholder="John Doe"
+                  autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -244,6 +249,7 @@ export default function AuthCard({ type }: AuthCardProps) {
               <input
                 type="email"
                 placeholder="you@example.com"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -312,6 +318,7 @@ export default function AuthCard({ type }: AuthCardProps) {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
+                autoComplete={isLogin ? "current-password" : "new-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -385,6 +392,7 @@ export default function AuthCard({ type }: AuthCardProps) {
                 <input
                   type="password"
                   placeholder="••••••••"
+                  autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) =>
                     setConfirmPassword(e.target.value)
@@ -507,7 +515,7 @@ export default function AuthCard({ type }: AuthCardProps) {
         <div className="mt-5 text-center text-xs text-slate-500 sm:mt-6 sm:text-sm dark:text-slate-400">
           {isLogin ? (
             <>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 href="/register"
                 className="

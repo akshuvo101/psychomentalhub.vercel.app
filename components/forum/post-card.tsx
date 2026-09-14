@@ -40,17 +40,29 @@ export default function PostCard({
       </p>
 
       <div className="mt-6 flex items-center gap-6 border-t border-slate-100 pt-4 dark:border-slate-800">
-        <button className="flex items-center gap-2 text-slate-500 transition hover:text-red-500">
+        <button
+          type="button"
+          aria-label="Like post"
+          className="flex items-center gap-2 text-slate-500 transition hover:text-red-500"
+        >
           <Heart className="h-5 w-5" />
           24
         </button>
 
-        <button className="flex items-center gap-2 text-slate-500 transition hover:text-emerald-500">
+        <button
+          type="button"
+          aria-label="View comments"
+          className="flex items-center gap-2 text-slate-500 transition hover:text-emerald-500"
+        >
           <MessageCircle className="h-5 w-5" />
           8
         </button>
 
-        <button className="flex items-center gap-2 text-slate-500 transition hover:text-cyan-500">
+        <button
+          type="button"
+          aria-label="Share post"
+          className="flex items-center gap-2 text-slate-500 transition hover:text-cyan-500"
+        >
           <Share2 className="h-5 w-5" />
           Share
         </button>

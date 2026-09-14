@@ -87,7 +87,9 @@ export default function AdminHeader() {
 
           <div className="flex items-center gap-4">
             <button
+              type="button"
               onClick={() => setOpen(true)}
+              aria-label="Open admin navigation"
               className="
                 rounded-xl
                 border
@@ -147,6 +149,8 @@ export default function AdminHeader() {
             {/* Notifications */}
 
             <button
+              type="button"
+              aria-label="Open admin notifications"
               className="
                 relative
                 rounded-2xl
@@ -171,6 +175,8 @@ export default function AdminHeader() {
               ref={menuRef}
             >
               <button
+                type="button"
+                aria-label="Toggle admin profile menu"
                 onClick={() =>
                   setOpenMenu(!openMenu)
                 }

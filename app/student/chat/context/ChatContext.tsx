@@ -73,6 +73,12 @@ interface ChatContextValue {
   isInitializingConversation: boolean;
 
   // --------------------------------------------------------
+  // AI availability
+  // --------------------------------------------------------
+
+  isAiLimitReached: boolean;
+
+  // --------------------------------------------------------
   // Error
   // --------------------------------------------------------
 
@@ -106,6 +112,8 @@ interface ChatContextValue {
   ) => Promise<void>;
 
   clearConversation: () => void;
+
+  clearAiLimit: () => void;
 }
 
 // ==========================================================
@@ -176,6 +184,15 @@ export function ChatProvider({
   ] = useState(false);
 
   // ========================================================
+  // AI Availability
+  // ========================================================
+
+  const [
+    isAiLimitReached,
+    setIsAiLimitReached,
+  ] = useState(false);
+
+  // ========================================================
   // Error
   // ========================================================
 
@@ -192,11 +209,6 @@ export function ChatProvider({
   // Initialization tracking
   // ========================================================
 
-  /*
-   * Prevents the same conversation from being
-   * initialized more than once during the current
-   * provider lifecycle.
-   */
   const initializedConversationIdsRef =
     useRef<Set<string>>(new Set());
 
@@ -234,10 +246,6 @@ export function ChatProvider({
         const data: ConversationListItem[] =
           result.data ?? [];
 
-        // ----------------------------------------------------
-        // Sort by latest update
-        // ----------------------------------------------------
-
         const sortedConversations =
           [...data].sort(
             (a, b) =>
@@ -252,10 +260,6 @@ export function ChatProvider({
         setConversations(
           sortedConversations
         );
-
-        // ----------------------------------------------------
-        // Preserve current conversation
-        // ----------------------------------------------------
 
         setActiveConversationId(
           (current) => {
@@ -336,10 +340,6 @@ export function ChatProvider({
           );
         }
 
-        // ----------------------------------------------------
-        // Ignore stale response
-        // ----------------------------------------------------
-
         if (
           requestId !==
           messageRequestIdRef.current
@@ -407,24 +407,30 @@ export function ChatProvider({
         method: "PATCH",
         cache: "no-store",
       }
-    ).then((response) => {
-      if (!response.ok) {
-        return;
-      }
+    )
+      .then((response) => {
+        if (!response.ok) {
+          return;
+        }
 
-      setConversations((prev) =>
-        prev.map((conversation) =>
-          conversation.id === activeConversationId
-            ? { ...conversation, is_new: false }
-            : conversation
-        )
-      );
-    }).catch((error) => {
-      console.error(
-        "Failed to mark conversation as read:",
-        error
-      );
-    });
+        setConversations((prev) =>
+          prev.map((conversation) =>
+            conversation.id ===
+            activeConversationId
+              ? {
+                  ...conversation,
+                  is_new: false,
+                }
+              : conversation
+          )
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "Failed to mark conversation as read:",
+          error
+        );
+      });
 
     loadMessages(
       activeConversationId
@@ -503,10 +509,6 @@ export function ChatProvider({
           const newConversation: ConversationListItem =
             result.data;
 
-          // --------------------------------------------------
-          // Add conversation to sidebar
-          // --------------------------------------------------
-
           setConversations((prev) => [
             newConversation,
 
@@ -517,23 +519,11 @@ export function ChatProvider({
             ),
           ]);
 
-          // --------------------------------------------------
-          // Make it active
-          // --------------------------------------------------
-
           setActiveConversationId(
             newConversation.id
           );
 
-          // --------------------------------------------------
-          // Start empty
-          // --------------------------------------------------
-
           setMessages([]);
-
-          // --------------------------------------------------
-          // Remove initialization lock if somehow reused
-          // --------------------------------------------------
 
           initializedConversationIdsRef.current.delete(
             newConversation.id
@@ -565,9 +555,6 @@ export function ChatProvider({
   const initializeConversation =
     useCallback(
       async (conversationId: string) => {
-        /*
-         * Prevent duplicate initialization.
-         */
         if (
           initializedConversationIdsRef.current.has(
             conversationId
@@ -576,13 +563,6 @@ export function ChatProvider({
           return;
         }
 
-        /*
-         * Mark immediately.
-         *
-         * This prevents React Strict Mode or
-         * multiple renders from triggering
-         * the same initialization twice.
-         */
         initializedConversationIdsRef.current.add(
           conversationId
         );
@@ -594,15 +574,6 @@ export function ChatProvider({
 
           setError(null);
 
-          /*
-           * IMPORTANT:
-           *
-           * We intentionally use the existing
-           * message API here.
-           *
-           * The backend will process this as the
-           * initial AI conversation request.
-           */
           const response = await fetch(
             `/api/chat/conversations/${conversationId}/messages`,
             {
@@ -624,6 +595,24 @@ export function ChatProvider({
           const result =
             await response.json();
 
+          // --------------------------------------------------
+          // AI quota reached
+          // --------------------------------------------------
+
+          if (response.status === 429) {
+            setIsAiLimitReached(true);
+
+            setIsInitializingConversation(
+              false
+            );
+
+            initializedConversationIdsRef.current.delete(
+              conversationId
+            );
+
+            return;
+          }
+
           if (
             !response.ok ||
             !result.success
@@ -634,13 +623,6 @@ export function ChatProvider({
             );
           }
 
-          /*
-           * The current backend response is expected
-           * to return userMessage + assistantMessage.
-           *
-           * For a dedicated initialization endpoint,
-           * we can change this section later.
-           */
           const {
             assistantMessage,
           } = result.data;
@@ -656,18 +638,11 @@ export function ChatProvider({
               assistantMessage
             );
 
-          /*
-           * Only update visible messages if this
-           * conversation is currently active.
-           */
           if (
             activeConversationId ===
             conversationId
           ) {
             setMessages((prev) => {
-              /*
-               * Prevent duplicate assistant messages.
-               */
               const alreadyExists =
                 prev.some(
                   (message) =>
@@ -690,9 +665,6 @@ export function ChatProvider({
             });
           }
 
-          /*
-           * Update conversation timestamp.
-           */
           setConversations((prev) => {
             const updated =
               prev.map(
@@ -718,9 +690,6 @@ export function ChatProvider({
             );
           });
         } catch (error) {
-          /*
-           * Allow retry if initialization failed.
-           */
           initializedConversationIdsRef.current.delete(
             conversationId
           );
@@ -761,24 +730,17 @@ export function ChatProvider({
         conversationId ??
         activeConversationId;
 
-      // ------------------------------------------------------
-      // Validation
-      // ------------------------------------------------------
-
       if (
         !content ||
         isSendingMessage ||
-        !targetConversationId
+        !targetConversationId ||
+        isAiLimitReached
       ) {
         return;
       }
 
       const currentConversationId =
         targetConversationId;
-
-      // ------------------------------------------------------
-      // Temporary message ID
-      // ------------------------------------------------------
 
       const temporaryMessageId =
         `temp-${crypto.randomUUID()}`;
@@ -843,6 +805,28 @@ export function ChatProvider({
         const result =
           await response.json();
 
+        // ==================================================
+        // AI quota reached
+        // ==================================================
+
+        if (response.status === 429) {
+          setIsAiLimitReached(true);
+
+          setMessages((prev) =>
+            prev.filter(
+              (message) =>
+                message.id !==
+                temporaryMessageId
+            )
+          );
+
+          return;
+        }
+
+        // ==================================================
+        // Other API errors
+        // ==================================================
+
         if (
           !response.ok ||
           !result.success
@@ -853,9 +837,14 @@ export function ChatProvider({
           );
         }
 
+        // ==================================================
+        // Get API response
+        // ==================================================
+
         const {
           userMessage,
           assistantMessage,
+          conversationTitle,
         } = result.data;
 
         const mappedUserMessage =
@@ -919,6 +908,13 @@ export function ChatProvider({
                   ? {
                       ...conversation,
 
+                      ...(conversationTitle
+                        ? {
+                            title:
+                              conversationTitle,
+                          }
+                        : {}),
+
                       updated_at:
                         assistantMessage.created_at,
                     }
@@ -940,10 +936,6 @@ export function ChatProvider({
           "Failed to send message:",
           error
         );
-
-        // ----------------------------------------------------
-        // Remove ONLY this temporary message
-        // ----------------------------------------------------
 
         setMessages((prev) =>
           prev.filter(
@@ -967,6 +959,7 @@ export function ChatProvider({
     [
       activeConversationId,
       isSendingMessage,
+      isAiLimitReached,
     ]
   );
 
@@ -1003,17 +996,9 @@ export function ChatProvider({
             );
           }
 
-          // --------------------------------------------------
-          // Remove initialization lock
-          // --------------------------------------------------
-
           initializedConversationIdsRef.current.delete(
             conversationId
           );
-
-          // --------------------------------------------------
-          // Remove from sidebar
-          // --------------------------------------------------
 
           setConversations((prev) => {
             const remaining =
@@ -1022,10 +1007,6 @@ export function ChatProvider({
                   conversation.id !==
                   conversationId
               );
-
-            // ----------------------------------------------
-            // If deleted conversation was active
-            // ----------------------------------------------
 
             if (
               conversationId ===
@@ -1074,6 +1055,16 @@ export function ChatProvider({
     }, []);
 
   // ========================================================
+  // Clear AI Limit
+  // ========================================================
+
+  const clearAiLimit =
+    useCallback(() => {
+      setIsAiLimitReached(false);
+      setError(null);
+    }, []);
+
+  // ========================================================
   // Context Value
   // ========================================================
 
@@ -1093,6 +1084,8 @@ export function ChatProvider({
 
       isInitializingConversation,
 
+      isAiLimitReached,
+
       error,
 
       loadConversations,
@@ -1108,6 +1101,8 @@ export function ChatProvider({
       deleteConversation,
 
       clearConversation,
+
+      clearAiLimit,
     }),
     [
       conversations,
@@ -1117,6 +1112,7 @@ export function ChatProvider({
       isLoadingMessages,
       isSendingMessage,
       isInitializingConversation,
+      isAiLimitReached,
       error,
       loadConversations,
       selectConversation,
@@ -1125,6 +1121,7 @@ export function ChatProvider({
       sendMessage,
       deleteConversation,
       clearConversation,
+      clearAiLimit,
     ]
   );
 

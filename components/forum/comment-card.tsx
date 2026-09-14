@@ -16,7 +16,11 @@ export default function CommentCard({
           {author}
         </h4>
 
-        <button className="text-slate-400 hover:text-emerald-500">
+        <button
+          type="button"
+          aria-label="Reply to comment"
+          className="text-slate-400 hover:text-emerald-500"
+        >
           <Reply className="h-4 w-4" />
         </button>
       </div>
@@ -25,7 +29,11 @@ export default function CommentCard({
         {comment}
       </p>
 
-      <button className="mt-3 flex items-center gap-2 text-sm text-slate-500 hover:text-red-500">
+      <button
+        type="button"
+        aria-label="Like comment"
+        className="mt-3 flex items-center gap-2 text-sm text-slate-500 hover:text-red-500"
+      >
         <Heart className="h-4 w-4" />
         Like
       </button>

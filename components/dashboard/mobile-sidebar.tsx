@@ -131,6 +131,7 @@ export default function MobileSidebar() {
       ====================================== */}
 
       <aside
+        id="student-mobile-navigation"
         className={`
           fixed
           bottom-3
@@ -222,7 +223,7 @@ export default function MobileSidebar() {
           <button
             type="button"
             onClick={closeSidebar}
-            aria-label="Close navigation"
+            aria-label="Close student navigation menu"
             className="
               flex
               h-9
@@ -478,8 +479,9 @@ export default function MobileSidebar() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Open navigation"
+        aria-label={open ? "Close student navigation menu" : "Open student navigation menu"}
         aria-expanded={open}
+        aria-controls="student-mobile-navigation"
         className="
           flex
           h-10

@@ -4,7 +4,10 @@ import {
   Mail,
   Phone,
   MapPin,
-  
+  UserRound,
+  GraduationCap,
+  Code2,
+
 } from "lucide-react";
 
 import Container from "./container";
@@ -157,35 +160,29 @@ export default function Footer() {
 
           {/* Contact */}
 
-          <div>
-            <h4 className="mb-5 text-lg font-semibold text-slate-900 dark:text-white">
-              Contact
-            </h4>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Code2 className="mt-1 h-5 w-5 text-emerald-500" />
 
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Mail className="mt-1 h-5 w-5 text-emerald-500" />
+              <span className="text-slate-600 dark:text-slate-400">
+                 AI-Powered Mental Wellness Platform
+              </span>
+            </div>
 
-                <span className="text-slate-600 dark:text-slate-400">
-                  support@psychomentalhub.com
-                </span>
-              </div>
+            <div className="flex items-start gap-3">
+              <GraduationCap className="mt-1 h-5 w-5 text-emerald-500" />
 
-              <div className="flex items-start gap-3">
-                <Phone className="mt-1 h-5 w-5 text-emerald-500" />
+              <span className="text-slate-600 dark:text-slate-400">
+                BUBT • Computer Science & Engineering
+              </span>
+            </div>
 
-                <span className="text-slate-600 dark:text-slate-400">
-                  +880 1234 567890
-                </span>
-              </div>
+            <div className="flex items-start gap-3">
+              <UserRound className="mt-1 h-5 w-5 text-emerald-500" />
 
-              <div className="flex items-start gap-3">
-                <MapPin className="mt-1 h-5 w-5 text-emerald-500" />
-
-                <span className="text-slate-600 dark:text-slate-400">
-                  Dhaka, Bangladesh
-                </span>
-              </div>
+              <span className="text-slate-600 dark:text-slate-400">
+                Developed by AK Shuvo
+              </span>
             </div>
           </div>
         </div>
@@ -193,16 +190,14 @@ export default function Footer() {
         {/* Bottom */}
 
         <div className="border-t border-slate-200 py-6 dark:border-slate-800">
-          <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row">
+          <div className="flex flex-col items-center justify-center gap-2 text-center">
             <p className="text-sm text-slate-500">
-              © 2026 Smart HealthHub. All rights reserved.
+              © 2026 PsychoMentalHub • Built for student well-being.
             </p>
 
-            <div className="flex gap-6 text-sm text-slate-500">
-              <Link href="/privacy">Privacy Policy</Link>
-
-              <Link href="/terms">Terms of Service</Link>
-            </div>
+            <p className="text-xs text-slate-400">
+              An AI-powered approach to student mental wellness
+            </p>
           </div>
         </div>
       </Container>

@@ -101,6 +101,8 @@ export interface SendMessageResult {
   userMessage: AIMessage;
 
   assistantMessage: AIMessage;
+
+  conversationTitle: string;
 }
 
 /**

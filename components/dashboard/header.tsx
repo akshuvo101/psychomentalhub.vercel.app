@@ -351,7 +351,7 @@ export default function Header() {
 
           <button
             type="button"
-            aria-label="Notifications"
+            aria-label="Open notifications menu"
             className="
               relative
               flex
@@ -409,6 +409,8 @@ export default function Header() {
               onClick={() =>
                 setOpenMenu((prev) => !prev)
               }
+              aria-label={openMenu ? "Close profile menu" : "Open profile menu"}
+              aria-expanded={openMenu}
               className="
                 group
                 flex

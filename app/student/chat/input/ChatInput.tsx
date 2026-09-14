@@ -83,11 +83,11 @@ export default function ChatInput({
             return;
         }
 
-        await onSend(value);
-
         setMessage("");
 
         resetTextarea();
+
+        await onSend(value);
     };
 
     /* ========================================================

@@ -218,7 +218,10 @@ export default function Navbar() {
             ) : (
               <div className="relative" ref={profileRef}>
                 <button
+                  type="button"
                   onClick={() => setProfileOpen(!profileOpen)}
+                  aria-label={profileOpen ? "Close profile menu" : "Open profile menu"}
+                  aria-expanded={profileOpen}
                   className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
                 >
                   {userAvatar ? (
@@ -272,7 +275,11 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
 
           <button
+            type="button"
             onClick={() => setOpen(!open)}
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}
+            aria-controls="mobile-navigation-menu"
             className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-white lg:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -285,6 +292,7 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-navigation-menu"
             initial={{
               opacity: 0,
               y: -20,

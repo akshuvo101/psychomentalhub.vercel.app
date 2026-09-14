@@ -23,157 +23,120 @@ export default function AssessmentLoadingPage() {
   const router = useRouter();
 
   const [progress, setProgress] = useState(0);
-
   const [error, setError] = useState("");
-
   const [errorType, setErrorType] =
     useState<AnalysisErrorType>(null);
-
-  const [retryAfter, setRetryAfter] =
-    useState(0);
-
-  const [isAnalyzing, setIsAnalyzing] =
-    useState(true);
-
-  const [isRetrying, setIsRetrying] =
-    useState(false);
+  const [retryAfter, setRetryAfter] = useState(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(true);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   /**
    * Run AI analysis
    */
-  const startAnalysis = useCallback(
-    async () => {
-      try {
-        setIsAnalyzing(true);
+  const startAnalysis = useCallback(async () => {
+    try {
+      setIsAnalyzing(true);
+      setError("");
+      setErrorType(null);
 
-        setError("");
-        setErrorType(null);
+      const assessmentId =
+        sessionStorage.getItem("assessmentId");
 
-        /**
-         * Get assessment ID
-         */
-        const assessmentId =
-          sessionStorage.getItem(
-            "assessmentId"
-          );
-
-        if (!assessmentId) {
-          setIsAnalyzing(false);
-
-          setError(
-            "We couldn't find your assessment. Please start the assessment again."
-          );
-
-          setErrorType("missing-id");
-
-          return;
-        }
-
-        /**
-         * Call AI analysis API
-         */
-        const response = await fetch(
-          "/api/assessment/analyze",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              assessmentId,
-            }),
-          }
-        );
-
-        const result =
-          await response.json();
-
-        /**
-         * Handle quota error
-         */
-        if (response.status === 429) {
-          const retryHeader =
-            response.headers.get(
-              "Retry-After"
-            );
-
-          const retrySeconds =
-            retryHeader
-              ? Math.max(
-                  1,
-                  Number(retryHeader)
-                )
-              : 60;
-
-          setRetryAfter(retrySeconds);
-
-          setError(
-            "AI analysis is temporarily unavailable."
-          );
-
-          setErrorType("quota");
-
-          setIsAnalyzing(false);
-
-          return;
-        }
-
-        /**
-         * Handle other API errors
-         */
-        if (
-          !response.ok ||
-          !result.success
-        ) {
-          throw new Error(
-            result.message ??
-              "Failed to analyze assessment."
-          );
-        }
-
-        /**
-         * SUCCESS
-         */
-        setError("");
-        setErrorType(null);
-
-        setProgress(100);
-
+      if (!assessmentId) {
         setIsAnalyzing(false);
-
-        /**
-         * Small delay so user can
-         * see "Analysis Complete"
-         */
-        setTimeout(() => {
-          sessionStorage.removeItem(
-            "assessmentId"
-          );
-
-          router.push(
-            "/student/assessment/result"
-          );
-        }, 900);
-      } catch (error) {
-        console.error(
-          "Assessment analysis error:",
-          error
+        setError(
+          "We couldn't find your assessment. Please start the assessment again."
         );
+        setErrorType("missing-id");
+        return;
+      }
 
-        setIsAnalyzing(false);
+      const response = await fetch(
+        "/api/assessment/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            assessmentId,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      /**
+       * AI quota / rate limit
+       */
+      if (response.status === 429) {
+        const retryHeader =
+          response.headers.get("Retry-After");
+
+        const parsedRetry =
+          retryHeader
+            ? Number(retryHeader)
+            : 0;
+
+        setRetryAfter(
+          Number.isFinite(parsedRetry) &&
+            parsedRetry > 0
+            ? parsedRetry
+            : 0
+        );
 
         setError(
-          error instanceof Error
-            ? error.message
-            : "Something went wrong while analyzing your assessment."
+          "The AI service has reached its current usage limit."
         );
 
-        setErrorType("general");
+        setErrorType("quota");
+        setIsAnalyzing(false);
+
+        return;
       }
-    },
-    [router]
-  );
+
+      /**
+       * Other API errors
+       */
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message ??
+            "Failed to analyze your assessment."
+        );
+      }
+
+      /**
+       * SUCCESS
+       */
+      setError("");
+      setErrorType(null);
+      setProgress(100);
+      setIsAnalyzing(false);
+
+      setTimeout(() => {
+        sessionStorage.removeItem("assessmentId");
+
+        router.push(
+          "/student/assessment/result"
+        );
+      }, 900);
+    } catch (error) {
+      console.error(
+        "Assessment analysis error:",
+        error
+      );
+
+      setIsAnalyzing(false);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong while analyzing your assessment."
+      );
+
+      setErrorType("general");
+    }
+  }, [router]);
 
   /**
    * Start analysis on page load
@@ -210,6 +173,9 @@ export default function AssessmentLoadingPage() {
 
   /**
    * Retry countdown
+   *
+   * Only runs when the API provides
+   * a real Retry-After value.
    */
   useEffect(() => {
     if (retryAfter <= 0) {
@@ -220,7 +186,6 @@ export default function AssessmentLoadingPage() {
       setRetryAfter((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-
           return 0;
         }
 
@@ -237,18 +202,11 @@ export default function AssessmentLoadingPage() {
    * Retry analysis
    */
   const handleRetry = async () => {
-    if (
-      retryAfter > 0 ||
-      isRetrying
-    ) {
+    if (retryAfter > 0 || isRetrying) {
       return;
     }
 
     setIsRetrying(true);
-
-    /**
-     * Reset visual progress
-     */
     setProgress(0);
 
     await startAnalysis();
@@ -260,9 +218,7 @@ export default function AssessmentLoadingPage() {
    * Go back to assessment
    */
   const handleBack = () => {
-    sessionStorage.removeItem(
-      "assessmentId"
-    );
+    sessionStorage.removeItem("assessmentId");
 
     router.push(
       "/student/assessment/questions"
@@ -277,6 +233,10 @@ export default function AssessmentLoadingPage() {
       return "AI Temporarily Unavailable";
     }
 
+    if (errorType === "missing-id") {
+      return "Assessment Not Found";
+    }
+
     if (error) {
       return "Analysis Failed";
     }
@@ -286,15 +246,15 @@ export default function AssessmentLoadingPage() {
     }
 
     if (progress < 50) {
-      return "Analyzing Neural Patterns...";
+      return "Analyzing Your Responses...";
     }
 
     if (progress < 75) {
-      return "Building Wellness Report...";
+      return "Building Your Wellness Profile...";
     }
 
     if (progress < 100) {
-      return "Generating Personalized Insights...";
+      return "Preparing Personalized Insights...";
     }
 
     return "Analysis Complete";
@@ -322,14 +282,12 @@ export default function AssessmentLoadingPage() {
 
       {/* Content */}
 
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-10">
         <div className="flex w-full max-w-lg flex-col items-center text-center">
           {/* Loading Brain */}
 
           {showLoading && (
-            <LoadingBrain
-              progress={progress}
-            />
+            <LoadingBrain progress={progress} />
           )}
 
           {/* Success Icon */}
@@ -364,7 +322,7 @@ export default function AssessmentLoadingPage() {
 
           {error && (
             <div
-              className="
+              className={`
                 flex
                 h-24
                 w-24
@@ -372,14 +330,23 @@ export default function AssessmentLoadingPage() {
                 justify-center
                 rounded-3xl
                 border
-                border-red-400/20
-                bg-red-500/10
                 shadow-2xl
-                shadow-red-500/10
-              "
+                ${
+                  errorType === "quota"
+                    ? `
+                      border-amber-400/20
+                      bg-amber-400/10
+                      shadow-amber-500/10
+                    `
+                    : `
+                      border-red-400/20
+                      bg-red-500/10
+                      shadow-red-500/10
+                    `
+                }
+              `}
             >
-              {errorType ===
-              "quota" ? (
+              {errorType === "quota" ? (
                 <Clock3
                   className="
                     h-11
@@ -426,8 +393,7 @@ export default function AssessmentLoadingPage() {
               uppercase
               tracking-[0.18em]
               ${
-                errorType ===
-                "quota"
+                errorType === "quota"
                   ? "text-amber-400"
                   : error
                     ? "text-red-400"
@@ -444,64 +410,72 @@ export default function AssessmentLoadingPage() {
 
           {error && (
             <div className="mt-6 w-full">
-              {/* Main message */}
+              {/* Main Message */}
 
-              <p className="text-sm leading-6 text-slate-300">
-                {error}
-              </p>
+              <div
+                className="
+                  rounded-2xl
+                  border
+                  border-white/10
+                  bg-white/[0.04]
+                  px-5
+                  py-5
+                  backdrop-blur-sm
+                "
+              >
+                <p className="text-sm font-medium leading-6 text-slate-200">
+                  {error}
+                </p>
 
-              {/* Quota info */}
+                {/* Quota Information */}
 
-              {errorType ===
-                "quota" && (
-                <>
-                  <p className="mt-3 text-xs leading-5 text-slate-500">
-                    Your assessment is
-                    safely saved. You
-                    can retry the AI
-                    analysis when the
-                    service is available
-                    again.
+                {errorType === "quota" && (
+                  <p className="mt-3 text-xs leading-5 text-slate-400">
+                    Your assessment is safely
+                    saved. You can try the AI
+                    analysis again when the
+                    service becomes available.
                   </p>
+                )}
+              </div>
 
-                  {/* Countdown */}
+              {/* Retry Countdown */}
 
-                  {retryAfter > 0 && (
-                    <div
-                      className="
-                        mx-auto
-                        mt-5
-                        flex
-                        w-fit
-                        items-center
-                        gap-2
-                        rounded-full
-                        border
-                        border-amber-400/20
-                        bg-amber-400/10
-                        px-4
-                        py-2
-                        text-sm
-                        font-medium
-                        text-amber-300
-                      "
-                    >
-                      <Clock3 className="h-4 w-4" />
+              {errorType === "quota" &&
+                retryAfter > 0 && (
+                  <div
+                    className="
+                      mx-auto
+                      mt-4
+                      flex
+                      w-fit
+                      items-center
+                      gap-2
+                      rounded-full
+                      border
+                      border-amber-400/20
+                      bg-amber-400/10
+                      px-4
+                      py-2
+                      text-xs
+                      font-medium
+                      text-amber-300
+                    "
+                  >
+                    <Clock3 className="h-3.5 w-3.5" />
 
-                      Try again in{" "}
-                      <span className="font-bold">
-                        {retryAfter}s
-                      </span>
-                    </div>
-                  )}
-                </>
-              )}
+                    Retry available in{" "}
+                    <span className="font-bold">
+                      {retryAfter}s
+                    </span>
+                  </div>
+                )}
 
               {/* Actions */}
 
               <div
                 className="
-                  mt-7
+                  mt-6
                   flex
                   flex-col
                   items-center
