@@ -5,7 +5,7 @@ PsychoMentalHub is an AI-powered mental wellness platform designed with universi
 > **Note:** PsychoMentalHub is designed for educational and self-awareness purposes. AI-generated results do not represent a medical diagnosis and should not replace professional mental health care.
 
 🔗 **Live Demo:** https://psychomentalhub.vercel.app  
-💻 **GitHub:**(https://github.com/akshuvo101/psychomentalhub)
+💻 **GitHub:** https://github.com/akshuvo101/psychomentalhub
 
 
 ## Why PsychoMentalHub?
@@ -120,32 +120,36 @@ Next.js Application / API Layer
                          │
                          ▼
                  AI Insights / Guidance
-Tech Stack
-Frontend
-Next.js
-React
-TypeScript
-Tailwind CSS
-Backend & Database
-Next.js API Routes
-Supabase
-PostgreSQL
-Supabase Authentication
-Row Level Security (RLS)
-AI
-Google Gemini AI
-Libraries & Services
-Lucide React
-Framer Motion
-Sonner
-jsPDF
-jsPDF AutoTable
-Resend
-Deployment & Version Control
-Vercel
-Git
-GitHub
-Authentication & Security
+## Tech Stack
+
+### Frontend
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+### Backend & Database
+- Next.js API Routes
+- Supabase
+- PostgreSQL
+- Supabase Authentication
+- Row Level Security (RLS)
+
+### AI
+- Google Gemini AI
+
+### Libraries & Services
+- Lucide React
+- Framer Motion
+- Sonner
+- jsPDF
+- jsPDF AutoTable
+- Resend
+
+### Deployment & Version Control
+- Vercel
+- Git
+- GitHub
 
 PsychoMentalHub uses Supabase Authentication together with role-based authorization and database-level security.
 
