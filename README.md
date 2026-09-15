@@ -5,7 +5,7 @@ PsychoMentalHub is an AI-powered mental wellness platform designed with universi
 > **Note:** PsychoMentalHub is designed for educational and self-awareness purposes. AI-generated results do not represent a medical diagnosis and should not replace professional mental health care.
 
 🔗 **Live Demo:** https://psychomentalhub.vercel.app  
-💻 **GitHub:** https://github.com/akshuvo101/psychomentalhub.vercel.app
+💻 **GitHub:**(https://github.com/akshuvo101/psychomentalhub)
 
 ---
 
