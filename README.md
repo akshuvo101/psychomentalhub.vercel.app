@@ -7,7 +7,6 @@ PsychoMentalHub is an AI-powered mental wellness platform designed with universi
 🔗 **Live Demo:** https://psychomentalhub.vercel.app  
 💻 **GitHub:**(https://github.com/akshuvo101/psychomentalhub)
 
----
 
 ## Why PsychoMentalHub?
 
@@ -17,7 +16,6 @@ PsychoMentalHub was built to make wellness assessment and self-awareness more ac
 
 The goal is to provide a simple platform where students can understand their wellness, reflect on their experiences, and take a first step toward support.
 
----
 
 ## Key Features
 
@@ -55,7 +53,6 @@ The goal is to provide a simple platform where students can understand their wel
 - Platform administration
 - System-level management
 
----
 
 ## AI-Powered Wellness
 
@@ -87,7 +84,6 @@ WellMind AI provides conversational wellness guidance around areas such as stres
 
 It is designed for general wellness and self-awareness, not professional diagnosis or treatment.
 
----
 
 ## System Architecture
 
